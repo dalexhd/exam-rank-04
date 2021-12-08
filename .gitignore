@@ -2,3 +2,4 @@
 microshell
 leaks.res
 out.res
+*.dSYM
