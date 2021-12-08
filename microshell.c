@@ -41,8 +41,7 @@ char	**tokenize(char **argv, int start, int end)
 
 int	main(int argc, char **argv, char **envp)
 {
-	int		i, pos, start, end;
-	int		fd[2], fd_in;
+	int		i, pos, start, end, fd[2], fd_in;
 	pid_t	pid;
 	char	**tokens;
 
