@@ -1,5 +1,4 @@
 .vscode
 microshell
-leaks.res
-out.res
 *.dSYM
+*.res

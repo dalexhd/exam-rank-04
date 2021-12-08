@@ -4,9 +4,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-size_t	ft_strlen(char *s)
+size_t ft_strlen(char *s)
 {
-	size_t	i;
+	size_t i;
 
 	i = 0;
 	while (s[i])
@@ -14,7 +14,7 @@ size_t	ft_strlen(char *s)
 	return (i);
 }
 
-void	error(char *err, char *path)
+void error(char *err, char *path)
 {
 	write(STDERR_FILENO, err, ft_strlen(err));
 	if (path)
@@ -25,10 +25,10 @@ void	error(char *err, char *path)
 	exit(1);
 }
 
-char	**tokenize(char **argv, int start, int end)
+char **tokenize(char **argv, int start, int end)
 {
-	char	**res;
-	int		i;
+	char **res;
+	int i;
 
 	if ((res = malloc(sizeof(char *) * (end - start + 1))) == NULL)
 		return (NULL);
@@ -39,11 +39,11 @@ char	**tokenize(char **argv, int start, int end)
 	return (res);
 }
 
-int	main(int argc, char **argv, char **envp)
+int main(int argc, char **argv, char **envp)
 {
-	int		i, pos, start, end, fd[2], fd_in;
-	pid_t	pid;
-	char	**tokens;
+	int i, pos, start, end, fd[2], fd_in;
+	pid_t pid;
+	char **tokens;
 
 	i = 1;
 	while (i < argc)
@@ -59,17 +59,12 @@ int	main(int argc, char **argv, char **envp)
 				end++;
 			tokens = tokenize(argv, start, end);
 			if (
-				tokens == NULL
-				|| pipe(fd) == -1
-				|| (pid = fork()) == -1
-			)
+				tokens == NULL || pipe(fd) == -1 || (pid = fork()) == -1)
 				error("error: fatal\n", NULL);
 			else if (pid == 0)
 			{
 				if (
-					dup2(fd_in, 0) == -1
-					|| (end < pos && dup2(fd[1], 1) == -1)
-				)
+					dup2(fd_in, 0) == -1 || (end < pos && dup2(fd[1], 1) == -1))
 					error("error: fatal\n", NULL);
 				close(fd_in);
 				close(fd[0]);
