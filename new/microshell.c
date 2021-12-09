@@ -3,7 +3,6 @@
 #include <string.h>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include <errno.h>
 
 size_t	ft_strlen(char *str)
 {
@@ -93,7 +92,6 @@ int	main(int argc, char *argv[], char *envp[])
 				if (fd_in)
 					close(fd_in);
 				fd_in = fd[0];
-
 			}
 			start = end + 1;
 		}
