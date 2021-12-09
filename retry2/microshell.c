@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <errno.h>
@@ -46,26 +47,24 @@ char	**tokenize(char *argv[], int start, int end)
 
 int	main(int argc, char *argv[], char *envp[])
 {
-	int	fd[2], fd_in, start, end, pos, i;
+	int	i, fd[2], fd_in, start, end, pos;
 	char **tokens;
 	pid_t	pid;
-
+	
 	i = 1;
-	while (i < argc && !strcmp(argv[i], ";"))
-		i++;
 	while (i < argc)
 	{
 		pos = start = end = i;
 		while (pos < argc && strcmp(argv[pos], ";"))
 			pos++;
-		fd_in = 0; 
+		fd_in = 0;
 		while (start < pos)
 		{
 			end = start;
 			while (end < pos && strcmp(argv[end], "|"))
 				end++;
 			tokens = tokenize(argv, start, end);
-			if (tokens == NULL || pipe(fd) == -1 || (pid = fork()) == -1)
+			if (!tokens || pipe(fd) == -1 || (pid = fork()) == -1)
 				ft_error("error: fatal\n", NULL);
 			else if (pid == 0)
 			{
@@ -93,14 +92,12 @@ int	main(int argc, char *argv[], char *envp[])
 				if (fd_in)
 					close(fd_in);
 				fd_in = fd[0];
-
+				free(tokens);
 			}
 			start = end + 1;
 		}
 		i = pos + 1;
 		close(fd_in);
 	}
-	system("leaks microshell | grep \"ROOT LEAK\"");
-	system("lsof -c microshell | grep microshell");
 	return (0);
 }

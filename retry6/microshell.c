@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <errno.h>
@@ -51,14 +52,12 @@ int	main(int argc, char *argv[], char *envp[])
 	pid_t	pid;
 
 	i = 1;
-	while (i < argc && !strcmp(argv[i], ";"))
-		i++;
 	while (i < argc)
 	{
 		pos = start = end = i;
 		while (pos < argc && strcmp(argv[pos], ";"))
 			pos++;
-		fd_in = 0; 
+		fd_in = 0;
 		while (start < pos)
 		{
 			end = start;
@@ -93,14 +92,12 @@ int	main(int argc, char *argv[], char *envp[])
 				if (fd_in)
 					close(fd_in);
 				fd_in = fd[0];
-
+				free(tokens);
 			}
 			start = end + 1;
 		}
 		i = pos + 1;
 		close(fd_in);
 	}
-	system("leaks microshell | grep \"ROOT LEAK\"");
-	system("lsof -c microshell | grep microshell");
 	return (0);
 }

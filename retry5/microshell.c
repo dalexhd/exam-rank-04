@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <stdio.h>
 #include <sys/wait.h>
 #include <sys/types.h>
 #include <errno.h>
@@ -46,19 +47,17 @@ char	**tokenize(char *argv[], int start, int end)
 
 int	main(int argc, char *argv[], char *envp[])
 {
-	int	fd[2], fd_in, start, end, pos, i;
-	char **tokens;
+	int		fd[2], fd_in, end, start, pos, i;
+	char	**tokens;
 	pid_t	pid;
 
 	i = 1;
-	while (i < argc && !strcmp(argv[i], ";"))
-		i++;
 	while (i < argc)
 	{
 		pos = start = end = i;
 		while (pos < argc && strcmp(argv[pos], ";"))
 			pos++;
-		fd_in = 0; 
+		fd_in = 0;
 		while (start < pos)
 		{
 			end = start;
@@ -82,7 +81,7 @@ int	main(int argc, char *argv[], char *envp[])
 						ft_error("error: cd: cannot change directory to ", tokens[1]);
 				}
 				else if (execve(tokens[0], tokens, envp) == -1)
-					ft_error("error: cannot execute ", tokens[0]);
+					ft_error("error: cannot execute ",tokens[0]);
 				free(tokens);
 				exit(0);
 			}
@@ -93,14 +92,12 @@ int	main(int argc, char *argv[], char *envp[])
 				if (fd_in)
 					close(fd_in);
 				fd_in = fd[0];
-
+				free(tokens);
 			}
 			start = end + 1;
 		}
-		i = pos + 1;
 		close(fd_in);
+		i = pos + 1;
 	}
-	system("leaks microshell | grep \"ROOT LEAK\"");
-	system("lsof -c microshell | grep microshell");
 	return (0);
 }

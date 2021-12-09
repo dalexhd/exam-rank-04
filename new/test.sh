@@ -4,16 +4,11 @@ test_line () {
 	echo $@
 	echo $@ >> out.res
 	./microshell $@ > last.res && < last.res >> out.res &
-	sleep .250
-	echo >> out.res
-	if grep "detected memory leaks" < last.res > /dev/null 2> /dev/null ; then
-		printf "\e[0;31mLEAKS\n\e[0m"
-	fi
 	#cat -e out.res > out
 }
 
 printf "\e[1;32mCompile\n"
-gcc -g -Wall -Werror -Wextra -fsanitize=address -DTEST_SH microshell.c -o microshell
+gcc -g -Wall -Werror -Wextra -DTEST_SH microshell.c -o microshell
 printf "\e[1;36mTest\n\e[0m"
 rm -f out.res leaks.res out
 test_line /bin/ls
@@ -43,4 +38,3 @@ test_line ";" /bin/cat subject.en.txt ";" /bin/cat subject.en.txt "|" /usr/bin/g
 test_line blah "|" /bin/echo OK
 test_line blah "|" /bin/echo OK ";"
 printf "\e[1;32mDone\e[0m\n"
-rm -rf microshell.dSYM leaks.res
