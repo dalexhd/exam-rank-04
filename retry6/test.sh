@@ -1,3 +1,11 @@
 gcc -Wall -Wextra -Werror -fsanitize=address microshell.c -o microshell
-./microshell "/usr/bin/ls" "-la" "|" "/usr/bin/cat" "-e" "|" "/usr/bin/cat" "-e"
-./microshell "cd" ".." ";" "/usr/bin/pwd" "|" "/usr/bin/cat" "-e"
+
+CAT=$(whereis cat);
+LS=$(whereis ls);
+PWD=$(whereis pwd);
+
+./microshell $LS "-la" "|" $CAT "-e" "|" $CAT "-e"
+./microshell "cd" ".." ";" $PWD "|" $CAT "-e"
+./microshell "cd" ";" $PWD "|" $CAT "-e"
+./microshell "cd" "-" ";" $PWD "|" $CAT "-e"
+./microshell "cd" "sdfsdfsd" ";" $PWD "|" $CAT "-e" "|" $CAT "-e"

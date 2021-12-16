@@ -9,6 +9,20 @@ while (i < argc)
 }
 ```
 
+Now we will skip initial `;` repeated characters. Why? This is because `;;; ; ls -la ; pwd` is a valid command. We only need to skip those 3 initial `;` characters.
+```c
+while (pos < argc && strcmp(argv[pos], ";"))
+	pos++;
+```
+
+```c
+i = 1;
+while (i < argc)
+{
+	//rest of code
+}
+```
+
 We will assign pos, start, and end with the value of i in every while iteration.
 ```c
 pos = start = end = i;
@@ -55,14 +69,27 @@ tokens = tokenize(argv, start, end);
 ```
 
 
-Now we will check 3 things. First, if the above tokenize's malloc function returned any error. Second, if we fail to pipe fd, and the last one, if we're not able to create a fork. In those 3 cases we will exit 1 with the error fatal!
+
+Now we will check if the above tokenize's malloc function returned any error. After, we will check the command it's the cd built-in. In this case, we will try to perform a chdir to the token[1] value. If we fail, we will show an error WITHOUT EXIT!
+```c
+if (tokens == NULL)
+	ft_error("error: fatal\n", NULL, 0);
+if (strcmp(tokens[0], "cd") == 0)
+{
+	if (end - start != 2)
+		ft_error("error: cd: bad arguments\n", NULL, 1);
+	if (chdir(tokens[1]))
+		ft_error("error: cd: cannot change directory to ", tokens[1], 1);
+}
+```
+
+Now we will check 3 things. First, if we fail to pipe fd, and the then, if we're not able to create a fork. In those 3 cases we will exit 1 with the error fatal!
 ```c
 if (
-	tokens == NULL
-	|| pipe(fd) == -1
+	pipe(fd) == -1
 	|| (pid = fork()) == -1
 )
-	error("error: fatal\n", NULL);
+	ft_error("error: fatal\n", NULL, 0);
 ```
 
 if there aren't any errors in the above condition, we will go to another if else statement. Here, we will check if the assigned pid is equal to 0. This will mean that it's the parent process. So we will only enter this statement if this condition is true.
@@ -79,7 +106,7 @@ if (
 	dup2(fd_in, 0) == -1
 	|| (end < pos && dup2(fd[1], 1) == -1)
 )
-	error("error: fatal\n", NULL);
+	ft_error("error: fatal\n", NULL, 0);
 ```
 
 
@@ -88,19 +115,6 @@ After this, we will close the following trash!
 close(fd_in);
 close(fd[0]);
 close(fd[1]);
-```
-
-Now we will check if the command it's the cd built-in. In this case, we will try to perform a chdir to the token[1] value. If we fail, we will show an error and exit! In the case it's not cd, we will try to execve the binary passing the correspondent un-piped commands and also passing envp variables.
-```c
-if (strcmp(tokens[0], "cd") == 0)
-{
-	if (end - start != 2)
-		error("error: cd: bad arguments\n", NULL);
-	if (chdir(tokens[1]))
-		error("error: cd: cannot change directory to ", tokens[1]);
-}
-else if (execve(tokens[0], tokens, envp))
-	error("error: cannot execute ", tokens[0]);
 ```
 
 After this, we will free the tokens malloc and exit with status 0.
@@ -126,7 +140,6 @@ start = end + 1;
 
 The same for `;`. We will close fd_in and set i to pos + 1
 ```c
-close(fd_in);
 i = pos + 1;
 ```
 
